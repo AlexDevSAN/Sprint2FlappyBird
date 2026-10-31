@@ -1,0 +1,87 @@
+package ru.samsung.gamestudio;
+
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
+
+public class Bird {
+    int x, y;
+    int speed;
+    Texture[] framesArray;
+    int frameCounter;
+
+    int jumpHeight;
+    final int maxHeightOfJump = 200;
+    boolean jump;
+
+    public int width;
+    public int height;
+
+    // Новые уменьшенные размеры для честного хитбокса
+    public int hitboxWidth;
+    public int hitboxHeight;
+
+    public Bird(int x, int y, int speed) {
+        this.x = x;
+        this.y = y;
+        this.speed = speed;
+
+        framesArray = new Texture[]{
+            new Texture("birdTiles/bird0.png"),
+            new Texture("birdTiles/bird1.png"),
+            new Texture("birdTiles/bird2.png"),
+            new Texture("birdTiles/bird1.png")
+        };
+        frameCounter = 0;
+
+        this.width = (int)(framesArray[0].getWidth() * 0.7f);
+        this.height = (int)(framesArray[0].getHeight() * 0.7f);
+
+        // Хитбокс делаем на 20% меньше визуальной текстуры
+        this.hitboxWidth = (int)(this.width * 0.8f);
+        this.hitboxHeight = (int)(this.height * 0.8f);
+    }
+
+    public void onClick() {
+        jump = true;
+        jumpHeight = maxHeightOfJump + y;
+    }
+
+    public void fly() {
+        if (y >= jumpHeight) {
+            jump = false;
+        }
+
+        if (jump) {
+            y += speed;
+        } else {
+            y -= speed;
+        }
+    }
+
+    public boolean isInField() {
+        if (y < 0) {
+            return false;
+        }
+        if (y > MyGdxGame.SCR_HEIGHT) {
+            return false;
+        }
+        return true;
+    }
+
+    public void draw(Batch batch) {
+        int frameMultiplier = 10;
+
+        Texture currentFrame = framesArray[frameCounter / frameMultiplier];
+        batch.draw(currentFrame, x, y, width, height);
+
+        if (frameCounter++ == framesArray.length * frameMultiplier - 1) {
+            frameCounter = 0;
+        }
+    }
+
+    public void dispose() {
+        for (Texture texture : framesArray) {
+            texture.dispose();
+        }
+    }
+}
