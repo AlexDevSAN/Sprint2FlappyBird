@@ -11,11 +11,19 @@ public class ScreenGame implements Screen {
     Tube[] tubes;
     int tubeCount = 4;
     boolean isGameOver;
+    int gamePoints;
+
+    PointCounter pointCounter;
+
+    final int pointCounterMarginTop = 60;
+    final int pointCounterMarginRight = 400;
 
     public ScreenGame(MyGdxGame myGdxGame) {
         this.myGdxGame = myGdxGame;
         bird = new Bird(100, 300, 5);
         initTubes();
+
+        pointCounter = new PointCounter(MyGdxGame.SCR_WIDTH - pointCounterMarginRight, MyGdxGame.SCR_HEIGHT - pointCounterMarginTop);
     }
 
     private void initTubes() {
@@ -27,6 +35,7 @@ public class ScreenGame implements Screen {
 
     @Override
     public void show() {
+        gamePoints = 0;
         isGameOver = false;
     }
 
@@ -46,14 +55,21 @@ public class ScreenGame implements Screen {
 
             for (Tube tube : tubes) {
                 tube.move();
+
                 if (tube.isHit(bird)) {
                     System.out.println("hit");
                     isGameOver = true;
+                } else if (tube.needAddPoint(bird)) {
+                    gamePoints += 1;
+                    tube.setPointReceived();
+                    System.out.println(gamePoints);
                 }
             }
         }
 
+        // Очистка экрана красным цветом (1, 0, 0, 1)
         ScreenUtils.clear(1, 0, 0, 1);
+
         myGdxGame.camera.update();
         myGdxGame.batch.setProjectionMatrix(myGdxGame.camera.combined);
 
@@ -65,24 +81,15 @@ public class ScreenGame implements Screen {
 
         bird.draw(myGdxGame.batch);
 
+        pointCounter.draw(myGdxGame.batch, gamePoints);
+
         myGdxGame.batch.end();
     }
 
-    @Override
-    public void resize(int width, int height) {
-    }
-
-    @Override
-    public void pause() {
-    }
-
-    @Override
-    public void resume() {
-    }
-
-    @Override
-    public void hide() {
-    }
+    @Override public void resize(int width, int height) {}
+    @Override public void pause() {}
+    @Override public void resume() {}
+    @Override public void hide() {}
 
     @Override
     public void dispose() {
@@ -90,5 +97,6 @@ public class ScreenGame implements Screen {
         for (Tube tube : tubes) {
             tube.dispose();
         }
+        pointCounter.dispose();
     }
 }

@@ -17,8 +17,9 @@ public class Tube {
     final int padding = 50;
 
     int distanceBetweenTubes;
-
     Random random;
+
+    boolean isPointReceived;
 
     public Tube(int tubeCount, int tubeIdx) {
         random = new Random();
@@ -29,41 +30,47 @@ public class Tube {
 
         textureUpperTube = new Texture("Tube/tube_flipped.png");
         textureDownTube = new Texture("Tube/tube.png");
+
+        isPointReceived = false;
     }
 
     public void move() {
         x -= speed;
         if (x < -width) {
+            isPointReceived = false;
             x = MyGdxGame.SCR_WIDTH + distanceBetweenTubes;
             gapY = gapHeight / 2 + padding + random.nextInt(MyGdxGame.SCR_HEIGHT - 2 * (padding + gapHeight / 2));
         }
     }
 
     public boolean isHit(Bird bird) {
-        // Вычисляем координаты уменьшенного хитбокса строго по центру птички
         int birdLeft = bird.x + (bird.width - bird.hitboxWidth) / 2;
         int birdRight = birdLeft + bird.hitboxWidth;
         int birdBottom = bird.y + (bird.height - bird.hitboxHeight) / 2;
         int birdTop = birdBottom + bird.hitboxHeight;
 
-        // Границы труб
         int tubeLeft = x;
         int tubeRight = x + width;
         int lowerTubeTop = gapY - gapHeight / 2;
         int upperTubeBottom = gapY + gapHeight / 2;
 
-        // Проверяем пересечение по оси X
         if (birdRight >= tubeLeft && birdLeft <= tubeRight) {
-            // Столкновение с нижней трубой
-            if (birdBottom <= lowerTubeTop) {
-                return true;
-            }
-            // Столкновение с верхней трубой
-            if (birdTop >= upperTubeBottom) {
+            if (birdBottom <= lowerTubeTop || birdTop >= upperTubeBottom) {
                 return true;
             }
         }
         return false;
+    }
+
+    public boolean needAddPoint(Bird bird) {
+        if (!isPointReceived && bird.x > x + width) {
+            return true;
+        }
+        return false;
+    }
+
+    public void setPointReceived() {
+        isPointReceived = true;
     }
 
     public void draw(Batch batch) {
