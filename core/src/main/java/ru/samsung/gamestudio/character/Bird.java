@@ -1,11 +1,12 @@
-package ru.samsung.gamestudio;
+package ru.samsung.gamestudio.character;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import ru.samsung.gamestudio.MyGdxGame;
 
 public class Bird {
-    int x, y;
-    int speed;
+    public int x, y;
+    public int speed;
     Texture[] framesArray;
     int frameCounter;
 
@@ -16,7 +17,6 @@ public class Bird {
     public int width;
     public int height;
 
-    // Новые уменьшенные размеры для честного хитбокса
     public int hitboxWidth;
     public int hitboxHeight;
 
@@ -36,7 +36,6 @@ public class Bird {
         this.width = (int)(framesArray[0].getWidth() * 0.7f);
         this.height = (int)(framesArray[0].getHeight() * 0.7f);
 
-        // Хитбокс делаем на 20% меньше визуальной текстуры
         this.hitboxWidth = (int)(this.width * 0.8f);
         this.hitboxHeight = (int)(this.height * 0.8f);
     }
@@ -59,10 +58,7 @@ public class Bird {
     }
 
     public boolean isInField() {
-        if (y < 0) {
-            return false;
-        }
-        if (y > MyGdxGame.SCR_HEIGHT) {
+        if (y < 0 || y > MyGdxGame.SCR_HEIGHT) {
             return false;
         }
         return true;
@@ -70,7 +66,6 @@ public class Bird {
 
     public void draw(Batch batch) {
         int frameMultiplier = 10;
-
         Texture currentFrame = framesArray[frameCounter / frameMultiplier];
         batch.draw(currentFrame, x, y, width, height);
 

@@ -1,7 +1,8 @@
-package ru.samsung.gamestudio;
+package ru.samsung.gamestudio.character;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import ru.samsung.gamestudio.MyGdxGame;
 import java.util.Random;
 
 public class Tube {

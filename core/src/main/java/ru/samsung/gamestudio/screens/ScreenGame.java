@@ -1,8 +1,13 @@
-package ru.samsung.gamestudio;
+package ru.samsung.gamestudio.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.utils.ScreenUtils;
+import ru.samsung.gamestudio.MyGdxGame;
+import ru.samsung.gamestudio.character.Bird;
+import ru.samsung.gamestudio.character.Tube;
+import ru.samsung.gamestudio.components.MovingBackground;
+import ru.samsung.gamestudio.components.PointCounter;
 
 public class ScreenGame implements Screen {
     MyGdxGame myGdxGame;
@@ -10,10 +15,11 @@ public class ScreenGame implements Screen {
 
     Tube[] tubes;
     int tubeCount = 4;
-    boolean isGameOver;
+    public boolean isGameOver;
     int gamePoints;
 
     PointCounter pointCounter;
+    MovingBackground background;
 
     final int pointCounterMarginTop = 60;
     final int pointCounterMarginRight = 400;
@@ -24,6 +30,7 @@ public class ScreenGame implements Screen {
         initTubes();
 
         pointCounter = new PointCounter(MyGdxGame.SCR_WIDTH - pointCounterMarginRight, MyGdxGame.SCR_HEIGHT - pointCounterMarginTop);
+        background = new MovingBackground("background/game_bg.png");
     }
 
     private void initTubes() {
@@ -33,10 +40,13 @@ public class ScreenGame implements Screen {
         }
     }
 
+    // ИЗМЕНЕНИЕ: Метод show() полностью переписан под логику перезапуска со скриншота 3
     @Override
     public void show() {
         gamePoints = 0;
         isGameOver = false;
+        bird.y = MyGdxGame.SCR_HEIGHT / 2; // Устанавливаем птичку ровно по центру экрана по вертикали
+        initTubes();
     }
 
     @Override
@@ -46,6 +56,7 @@ public class ScreenGame implements Screen {
         }
 
         if (!isGameOver) {
+            background.move();
             bird.fly();
 
             if (!bird.isInField()) {
@@ -67,7 +78,6 @@ public class ScreenGame implements Screen {
             }
         }
 
-        // Очистка экрана красным цветом (1, 0, 0, 1)
         ScreenUtils.clear(1, 0, 0, 1);
 
         myGdxGame.camera.update();
@@ -75,15 +85,21 @@ public class ScreenGame implements Screen {
 
         myGdxGame.batch.begin();
 
+        background.draw(myGdxGame.batch);
+        bird.draw(myGdxGame.batch);
+
         for (Tube tube : tubes) {
             tube.draw(myGdxGame.batch);
         }
 
-        bird.draw(myGdxGame.batch);
-
         pointCounter.draw(myGdxGame.batch, gamePoints);
 
         myGdxGame.batch.end();
+
+        if (isGameOver) {
+            myGdxGame.screenRestart.gamePoints = gamePoints;
+            myGdxGame.setScreen(myGdxGame.screenRestart);
+        }
     }
 
     @Override public void resize(int width, int height) {}
@@ -98,5 +114,6 @@ public class ScreenGame implements Screen {
             tube.dispose();
         }
         pointCounter.dispose();
+        background.dispose();
     }
 }

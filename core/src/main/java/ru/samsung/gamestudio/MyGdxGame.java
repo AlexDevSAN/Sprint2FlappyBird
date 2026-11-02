@@ -3,12 +3,15 @@ package ru.samsung.gamestudio;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+// ИЗМЕНЕНИЕ: Исправлены импорты под имя пакета screens (во множественном числе)
+import ru.samsung.gamestudio.screens.ScreenGame;
+import ru.samsung.gamestudio.screens.ScreenRestart;
 
-/** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class MyGdxGame extends Game {
-    SpriteBatch batch;
+    public SpriteBatch batch;
     public OrthographicCamera camera;
-    ScreenGame screenGame;
+    public ScreenGame screenGame;
+    public ScreenRestart screenRestart;
 
     public static final int SCR_WIDTH = 1280;
     public static final int SCR_HEIGHT = 720;
@@ -20,6 +23,8 @@ public class MyGdxGame extends Game {
         camera.setToOrtho(false, SCR_WIDTH, SCR_HEIGHT);
 
         screenGame = new ScreenGame(this);
+        screenRestart = new ScreenRestart(this);
+
         setScreen(screenGame);
     }
 
