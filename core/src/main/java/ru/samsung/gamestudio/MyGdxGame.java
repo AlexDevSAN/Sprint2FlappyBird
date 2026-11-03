@@ -3,15 +3,18 @@ package ru.samsung.gamestudio;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-// ИЗМЕНЕНИЕ: Исправлены импорты под имя пакета screens (во множественном числе)
 import ru.samsung.gamestudio.screens.ScreenGame;
 import ru.samsung.gamestudio.screens.ScreenRestart;
+// ИЗМЕНЕНИЕ: Импортируем класс с маленькой буквы под имя твоего файла
+import ru.samsung.gamestudio.screens.screenMenu;
 
 public class MyGdxGame extends Game {
     public SpriteBatch batch;
     public OrthographicCamera camera;
     public ScreenGame screenGame;
     public ScreenRestart screenRestart;
+    // ИЗМЕНЕНИЕ: Тип переменной изменен на screenMenu
+    public screenMenu screenMenu;
 
     public static final int SCR_WIDTH = 1280;
     public static final int SCR_HEIGHT = 720;
@@ -24,8 +27,10 @@ public class MyGdxGame extends Game {
 
         screenGame = new ScreenGame(this);
         screenRestart = new ScreenRestart(this);
+        // ИЗМЕНЕНИЕ: Создаем объект класса screenMenu с маленькой буквы
+        screenMenu = new screenMenu(this);
 
-        setScreen(screenGame);
+        setScreen(screenMenu);
     }
 
     @Override

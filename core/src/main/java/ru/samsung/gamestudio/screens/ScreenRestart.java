@@ -13,13 +13,17 @@ public class ScreenRestart implements Screen {
     MyGdxGame myGdxGame;
     MovingBackground background;
     TextButton buttonRestart;
+    // ИЗМЕНЕНИЕ: Добавлено поле для кнопки выхода в меню
+    TextButton buttonMenu;
 
     PointCounter pointCounter;
     public int gamePoints;
 
     public ScreenRestart(MyGdxGame myGdxGame) {
         this.myGdxGame = myGdxGame;
-        buttonRestart = new TextButton(100, 400, "Restart");
+        buttonRestart = new TextButton(100, 450, "Restart");
+        // ИЗМЕНЕНИЕ: Инициализация кнопки меню на экране рестарта
+        buttonMenu = new TextButton(100, 250, "Main Menu");
         background = new MovingBackground("background/restart_bg.png");
         pointCounter = new PointCounter(750, 530);
     }
@@ -30,7 +34,6 @@ public class ScreenRestart implements Screen {
 
     @Override
     public void render(float delta) {
-        // ИЗМЕНЕНИЕ: Полностью исправлен и дописан блок отслеживания кликов по кнопке Restart
         if (Gdx.input.justTouched()) {
             Vector3 touch = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
             myGdxGame.camera.unproject(touch);
@@ -41,6 +44,9 @@ public class ScreenRestart implements Screen {
             if (buttonRestart.isHit(touchX, touchY)) {
                 myGdxGame.screenGame.show();
                 myGdxGame.setScreen(myGdxGame.screenGame);
+            } else if (buttonMenu.isHit(touchX, touchY)) {
+                // ИЗМЕНЕНИЕ: Переключение на экран главного меню при клике на buttonMenu
+                myGdxGame.setScreen(myGdxGame.screenMenu);
             }
         }
 
@@ -54,6 +60,8 @@ public class ScreenRestart implements Screen {
         myGdxGame.batch.begin();
         background.draw(myGdxGame.batch);
         buttonRestart.draw(myGdxGame.batch);
+        // ИЗМЕНЕНИЕ: Отрисовка кнопки меню
+        buttonMenu.draw(myGdxGame.batch);
         pointCounter.draw(myGdxGame.batch, gamePoints);
         myGdxGame.batch.end();
     }
@@ -67,6 +75,7 @@ public class ScreenRestart implements Screen {
     public void dispose() {
         background.dispose();
         buttonRestart.dispose();
+        buttonMenu.dispose(); // ИЗМЕНЕНИЕ: Очистка ресурсов новой кнопки
         pointCounter.dispose();
     }
 }
