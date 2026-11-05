@@ -10,7 +10,7 @@ public class MovingBackground {
     int texture1X, texture2X;
     int speed = 2;
 
-    // ИЗМЕНЕНИЕ: Имя параметра изменено на pathToTexture в точном соответствии с методичкой курса
+
     public MovingBackground(String pathToTexture) {
         texture1X = 0;
         texture2X = MyGdxGame.SCR_WIDTH;

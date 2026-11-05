@@ -8,7 +8,7 @@ import ru.samsung.gamestudio.MyGdxGame;
 import ru.samsung.gamestudio.components.MovingBackground;
 import ru.samsung.gamestudio.components.TextButton;
 
-// ИЗМЕНЕНИЕ: Имя класса изменено на screenMenu (с маленькой буквы) в точное соответствие с файлом
+
 public class screenMenu implements Screen {
     MyGdxGame myGdxGame;
 

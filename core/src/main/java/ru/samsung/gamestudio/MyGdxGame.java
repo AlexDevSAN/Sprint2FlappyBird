@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import ru.samsung.gamestudio.screens.ScreenGame;
 import ru.samsung.gamestudio.screens.ScreenRestart;
-// ИЗМЕНЕНИЕ: Импортируем класс с маленькой буквы под имя твоего файла
 import ru.samsung.gamestudio.screens.screenMenu;
 
 public class MyGdxGame extends Game {
@@ -13,7 +12,7 @@ public class MyGdxGame extends Game {
     public OrthographicCamera camera;
     public ScreenGame screenGame;
     public ScreenRestart screenRestart;
-    // ИЗМЕНЕНИЕ: Тип переменной изменен на screenMenu
+
     public screenMenu screenMenu;
 
     public static final int SCR_WIDTH = 1280;

@@ -40,12 +40,12 @@ public class ScreenGame implements Screen {
         }
     }
 
-    // ИЗМЕНЕНИЕ: Метод show() полностью переписан под логику перезапуска со скриншота 3
+
     @Override
     public void show() {
         gamePoints = 0;
         isGameOver = false;
-        bird.y = MyGdxGame.SCR_HEIGHT / 2; // Устанавливаем птичку ровно по центру экрана по вертикали
+        bird.y = MyGdxGame.SCR_HEIGHT / 2;
         initTubes();
     }
 
