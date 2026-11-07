@@ -14,7 +14,7 @@ public class Tube {
 
     final int width = 200;
     final int height = 700;
-    final int gapHeight = 400;
+    int gapHeight = 400; // без final: уровень сложности его меняет
     final int padding = 50;
 
     int distanceBetweenTubes;
@@ -34,6 +34,14 @@ public class Tube {
         textureDownTube = new Texture(downTubePath);
 
         isPointReceived = false;
+    }
+
+    // скорость и просвет текущего уровня, вызывается в начале каждой игры
+    public void setDifficulty(int speed, int gapHeight) {
+        this.speed = speed;
+        this.gapHeight = gapHeight;
+        // просвет стал другим, поэтому место просвета выбираем заново
+        gapY = gapHeight / 2 + padding + random.nextInt(MyGdxGame.SCR_HEIGHT - 2 * (padding + gapHeight / 2));
     }
 
     public void move() {

@@ -18,6 +18,11 @@ public class MovingBackground {
         texture = new Texture(pathToTexture);
     }
 
+    // в игре скорость фона зависит от уровня сложности
+    public void setSpeed(int speed) {
+        this.speed = speed;
+    }
+
     public void move() {
         texture1X -= speed;
         texture2X -= speed;

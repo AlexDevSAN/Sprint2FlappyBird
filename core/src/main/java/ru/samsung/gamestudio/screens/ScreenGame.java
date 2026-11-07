@@ -74,6 +74,11 @@ public class ScreenGame implements Screen {
         isGameOver = false;
         bird.y = MyGdxGame.SCR_HEIGHT / 2;
         initTubes();
+        // уровень ставим в начале каждой игры, а не только когда колонны создаются
+        for (Tube tube : tubes) {
+            tube.setDifficulty(myGdxGame.difficulty.getTubeSpeed(), myGdxGame.difficulty.getGapHeight());
+        }
+        background.setSpeed(myGdxGame.difficulty.getBackgroundSpeed());
     }
 
     @Override
