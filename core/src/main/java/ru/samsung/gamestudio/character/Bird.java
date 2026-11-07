@@ -20,16 +20,17 @@ public class Bird {
     public int hitboxWidth;
     public int hitboxHeight;
 
-    public Bird(int x, int y, int speed) {
+    // skinFolder - папка с кадрами птицы, например "birdHero"
+    public Bird(int x, int y, int speed, String skinFolder) {
         this.x = x;
         this.y = y;
         this.speed = speed;
 
         framesArray = new Texture[]{
-            new Texture("birdTiles/bird0.png"),
-            new Texture("birdTiles/bird1.png"),
-            new Texture("birdTiles/bird2.png"),
-            new Texture("birdTiles/bird1.png")
+            new Texture(skinFolder + "/bird0.png"),
+            new Texture(skinFolder + "/bird1.png"),
+            new Texture(skinFolder + "/bird2.png"),
+            new Texture(skinFolder + "/bird1.png")
         };
         frameCounter = 0;
 

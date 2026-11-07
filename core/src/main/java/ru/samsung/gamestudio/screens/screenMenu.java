@@ -38,8 +38,8 @@ public class screenMenu implements Screen {
             int touchY = (int) touch.y;
 
             if (buttonStart.isHit(touchX, touchY)) {
-                myGdxGame.screenGame.show();
-                myGdxGame.setScreen(myGdxGame.screenGame);
+                // сначала выбираем карту, потом птицу, потом уже игра
+                myGdxGame.setScreen(myGdxGame.screenMap);
             } else if (buttonExit.isHit(touchX, touchY)) {
                 Gdx.app.exit();
             }

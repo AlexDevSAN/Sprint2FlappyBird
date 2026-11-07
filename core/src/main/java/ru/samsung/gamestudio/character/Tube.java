@@ -22,15 +22,16 @@ public class Tube {
 
     boolean isPointReceived;
 
-    public Tube(int tubeCount, int tubeIdx) {
+    // картинки колонн передаём снаружи, на каждой карте они свои
+    public Tube(int tubeCount, int tubeIdx, String upperTubePath, String downTubePath) {
         random = new Random();
 
         gapY = gapHeight / 2 + padding + random.nextInt(MyGdxGame.SCR_HEIGHT - 2 * (padding + gapHeight / 2));
         distanceBetweenTubes = (MyGdxGame.SCR_WIDTH + width) / (tubeCount - 1);
         x = distanceBetweenTubes * tubeIdx + MyGdxGame.SCR_WIDTH;
 
-        textureUpperTube = new Texture("Tube/tube_flipped.png");
-        textureDownTube = new Texture("Tube/tube.png");
+        textureUpperTube = new Texture(upperTubePath);
+        textureDownTube = new Texture(downTubePath);
 
         isPointReceived = false;
     }

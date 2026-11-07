@@ -11,7 +11,8 @@ import ru.samsung.gamestudio.components.PointCounter;
 
 public class ScreenGame implements Screen {
     MyGdxGame myGdxGame;
-    Bird bird;
+    Bird bird; // птица, которой играем сейчас
+    Bird[] birds; // все птицы: 0 - синяя, 1 - классика, 2 - герой
 
     Tube[] tubes;
     int tubeCount = 4;
@@ -19,24 +20,50 @@ public class ScreenGame implements Screen {
     int gamePoints;
 
     PointCounter pointCounter;
-    MovingBackground background;
+    MovingBackground background; // фон выбранной карты
+    MovingBackground[] backgrounds; // фоны карт: 0 - город, 1 - пещера
+
+    int mapIndex; // номер выбранной карты
+    // картинки колонн для каждой карты, в пещере вместо труб камни
+    final String[] upperTubePaths = {"Tube/tube_flipped.png", "cave/stone_flipped.png"};
+    final String[] downTubePaths = {"Tube/tube.png", "cave/stone.png"};
 
     final int pointCounterMarginTop = 60;
     final int pointCounterMarginRight = 400;
 
     public ScreenGame(MyGdxGame myGdxGame) {
         this.myGdxGame = myGdxGame;
-        bird = new Bird(100, 300, 5);
+        // всех птиц и все фоны грузим один раз, потом только выбираем нужные
+        birds = new Bird[]{
+            new Bird(100, 300, 5, "birdTiles"),
+            new Bird(100, 300, 5, "birdClassic"),
+            new Bird(100, 300, 5, "birdHero")
+        };
+        backgrounds = new MovingBackground[]{
+            new MovingBackground("background/game_bg.png"),
+            new MovingBackground("cave/cave_bg.png")
+        };
+        setBird(0);
+        setMap(0);
         initTubes();
 
         pointCounter = new PointCounter(MyGdxGame.SCR_WIDTH - pointCounterMarginRight, MyGdxGame.SCR_HEIGHT - pointCounterMarginTop);
-        background = new MovingBackground("background/game_bg.png");
+    }
+
+    // эти два метода вызывают экраны выбора птицы и карты
+    public void setBird(int birdIndex) {
+        bird = birds[birdIndex];
+    }
+
+    public void setMap(int mapIndex) {
+        this.mapIndex = mapIndex;
+        background = backgrounds[mapIndex];
     }
 
     private void initTubes() {
         tubes = new Tube[tubeCount];
         for (int i = 0; i < tubeCount; i++) {
-            tubes[i] = new Tube(tubeCount, i);
+            tubes[i] = new Tube(tubeCount, i, upperTubePaths[mapIndex], downTubePaths[mapIndex]);
         }
     }
 
@@ -109,11 +136,15 @@ public class ScreenGame implements Screen {
 
     @Override
     public void dispose() {
-        bird.dispose();
+        for (Bird skin : birds) {
+            skin.dispose();
+        }
         for (Tube tube : tubes) {
             tube.dispose();
         }
         pointCounter.dispose();
-        background.dispose();
+        for (MovingBackground mapBackground : backgrounds) {
+            mapBackground.dispose();
+        }
     }
 }

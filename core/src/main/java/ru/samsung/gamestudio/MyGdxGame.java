@@ -4,7 +4,9 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import ru.samsung.gamestudio.screens.ScreenGame;
+import ru.samsung.gamestudio.screens.ScreenMap;
 import ru.samsung.gamestudio.screens.ScreenRestart;
+import ru.samsung.gamestudio.screens.ScreenSkin;
 import ru.samsung.gamestudio.screens.screenMenu;
 
 public class MyGdxGame extends Game {
@@ -12,6 +14,8 @@ public class MyGdxGame extends Game {
     public OrthographicCamera camera;
     public ScreenGame screenGame;
     public ScreenRestart screenRestart;
+    public ScreenMap screenMap; // выбор карты
+    public ScreenSkin screenSkin; // выбор птицы
 
     public screenMenu screenMenu;
 
@@ -28,6 +32,8 @@ public class MyGdxGame extends Game {
         screenRestart = new ScreenRestart(this);
         // ИЗМЕНЕНИЕ: Создаем объект класса screenMenu с маленькой буквы
         screenMenu = new screenMenu(this);
+        screenMap = new ScreenMap(this);
+        screenSkin = new ScreenSkin(this);
 
         setScreen(screenMenu);
     }
