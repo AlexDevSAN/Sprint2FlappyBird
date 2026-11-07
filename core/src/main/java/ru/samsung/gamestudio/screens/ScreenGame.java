@@ -7,6 +7,7 @@ import ru.samsung.gamestudio.MyGdxGame;
 import ru.samsung.gamestudio.character.Bird;
 import ru.samsung.gamestudio.character.Tube;
 import ru.samsung.gamestudio.components.MovingBackground;
+import ru.samsung.gamestudio.components.ParticleSystem;
 import ru.samsung.gamestudio.components.PointCounter;
 
 public class ScreenGame implements Screen {
@@ -22,6 +23,7 @@ public class ScreenGame implements Screen {
     PointCounter pointCounter;
     MovingBackground background; // фон выбранной карты
     MovingBackground[] backgrounds; // фоны карт: 0 - город, 1 - пещера
+    ParticleSystem particles; // дым, перья или искры за птицей
 
     int mapIndex; // номер выбранной карты
     // картинки колонн для каждой карты, в пещере вместо труб камни
@@ -43,6 +45,7 @@ public class ScreenGame implements Screen {
             new MovingBackground("background/game_bg.png"),
             new MovingBackground("cave/cave_bg.png")
         };
+        particles = new ParticleSystem(); // до setBird, там она уже нужна
         setBird(0);
         setMap(0);
         initTubes();
@@ -53,6 +56,7 @@ public class ScreenGame implements Screen {
     // эти два метода вызывают экраны выбора птицы и карты
     public void setBird(int birdIndex) {
         bird = birds[birdIndex];
+        particles.setSkin(birdIndex); // шлейф как у выбранной птицы
     }
 
     public void setMap(int mapIndex) {
@@ -79,17 +83,22 @@ public class ScreenGame implements Screen {
             tube.setDifficulty(myGdxGame.difficulty.getTubeSpeed(), myGdxGame.difficulty.getGapHeight());
         }
         background.setSpeed(myGdxGame.difficulty.getBackgroundSpeed());
+        particles.worldSpeed = myGdxGame.difficulty.getTubeSpeed(); // частицы уносит со скоростью колонн
+        particles.clear(); // старые частицы из прошлой игры не нужны
     }
 
     @Override
     public void render(float delta) {
         if (!isGameOver && Gdx.input.justTouched()) {
             bird.onClick();
+            particles.addBurst(bird);
         }
 
         if (!isGameOver) {
             background.move();
             bird.fly();
+            particles.addTrail(bird);
+            particles.move();
 
             if (!bird.isInField()) {
                 System.out.println("not in field");
@@ -118,6 +127,7 @@ public class ScreenGame implements Screen {
         myGdxGame.batch.begin();
 
         background.draw(myGdxGame.batch);
+        particles.draw(myGdxGame.batch); // до птицы, чтобы частицы были позади неё
         bird.draw(myGdxGame.batch);
 
         for (Tube tube : tubes) {
@@ -151,5 +161,6 @@ public class ScreenGame implements Screen {
         for (MovingBackground mapBackground : backgrounds) {
             mapBackground.dispose();
         }
+        particles.dispose();
     }
 }
