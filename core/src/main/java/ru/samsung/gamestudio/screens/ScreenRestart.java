@@ -30,6 +30,8 @@ public class ScreenRestart implements Screen {
 
     @Override
     public void show() {
+        myGdxGame.sounds.stopMusic(); // на этом экране музыки нет, только джингл
+        myGdxGame.sounds.playGameOver();
     }
 
     @Override
@@ -42,9 +44,11 @@ public class ScreenRestart implements Screen {
             int touchY = (int) touch.y;
 
             if (buttonRestart.isHit(touchX, touchY)) {
+                myGdxGame.sounds.playClick();
                 myGdxGame.screenGame.show();
                 myGdxGame.setScreen(myGdxGame.screenGame);
             } else if (buttonMenu.isHit(touchX, touchY)) {
+                myGdxGame.sounds.playClick();
 
                 myGdxGame.setScreen(myGdxGame.screenMenu);
             }
@@ -63,6 +67,11 @@ public class ScreenRestart implements Screen {
         // ИЗМЕНЕНИЕ: Отрисовка кнопки меню
         buttonMenu.draw(myGdxGame.batch);
         pointCounter.draw(myGdxGame.batch, gamePoints);
+        myGdxGame.screenGame.achievementTracker.drawList(myGdxGame.batch);
+        myGdxGame.screenGame.achievementTracker.drawPopup(myGdxGame.batch); // Kamikaze и недопоказанные плашки
+        if (myGdxGame.screenGame.achievementTracker.isNewAchievement()) {
+            myGdxGame.sounds.playAchievement(); // и здесь мелодия для новой плашки
+        }
         myGdxGame.batch.end();
     }
 

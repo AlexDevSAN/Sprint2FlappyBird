@@ -26,6 +26,7 @@ public class screenMenu implements Screen {
 
     @Override
     public void show() {
+        myGdxGame.sounds.playMenuMusic();
     }
 
     @Override
@@ -38,6 +39,7 @@ public class screenMenu implements Screen {
             int touchY = (int) touch.y;
 
             if (buttonStart.isHit(touchX, touchY)) {
+                myGdxGame.sounds.playClick();
                 // сначала выбираем карту, потом птицу, потом уже игра
                 myGdxGame.setScreen(myGdxGame.screenMap);
             } else if (buttonExit.isHit(touchX, touchY)) {

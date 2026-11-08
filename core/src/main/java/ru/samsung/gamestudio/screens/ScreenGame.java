@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import ru.samsung.gamestudio.MyGdxGame;
 import ru.samsung.gamestudio.character.Bird;
 import ru.samsung.gamestudio.character.Tube;
+import ru.samsung.gamestudio.components.AchievementTracker;
 import ru.samsung.gamestudio.components.MovingBackground;
 import ru.samsung.gamestudio.components.ParticleSystem;
 import ru.samsung.gamestudio.components.PointCounter;
@@ -21,6 +22,7 @@ public class ScreenGame implements Screen {
     int gamePoints;
 
     PointCounter pointCounter;
+    public AchievementTracker achievementTracker; // public: список рисует экран рестарта
     MovingBackground background; // фон выбранной карты
     MovingBackground[] backgrounds; // фоны карт: 0 - город, 1 - пещера
     ParticleSystem particles; // дым, перья или искры за птицей
@@ -51,6 +53,7 @@ public class ScreenGame implements Screen {
         initTubes();
 
         pointCounter = new PointCounter(MyGdxGame.SCR_WIDTH - pointCounterMarginRight, MyGdxGame.SCR_HEIGHT - pointCounterMarginTop);
+        achievementTracker = new AchievementTracker();
     }
 
     // эти два метода вызывают экраны выбора птицы и карты
@@ -85,6 +88,8 @@ public class ScreenGame implements Screen {
         background.setSpeed(myGdxGame.difficulty.getBackgroundSpeed());
         particles.worldSpeed = myGdxGame.difficulty.getTubeSpeed(); // частицы уносит со скоростью колонн
         particles.clear(); // старые частицы из прошлой игры не нужны
+        myGdxGame.sounds.playMapMusic(mapIndex); // у каждой карты своя музыка
+        achievementTracker.reset(); // достижения считаются за одну игру
     }
 
     @Override
@@ -92,6 +97,7 @@ public class ScreenGame implements Screen {
         if (!isGameOver && Gdx.input.justTouched()) {
             bird.onClick();
             particles.addBurst(bird);
+            myGdxGame.sounds.playFlap();
         }
 
         if (!isGameOver) {
@@ -107,6 +113,7 @@ public class ScreenGame implements Screen {
 
             for (Tube tube : tubes) {
                 tube.move();
+                tube.updateClosestDistance(bird);
 
                 if (tube.isHit(bird)) {
                     System.out.println("hit");
@@ -114,6 +121,9 @@ public class ScreenGame implements Screen {
                 } else if (tube.needAddPoint(bird)) {
                     gamePoints += 1;
                     tube.setPointReceived();
+                    myGdxGame.sounds.playPoint();
+                    achievementTracker.onPoint(gamePoints, mapIndex);
+                    achievementTracker.onTubePassed(tube.getClosestDistance());
                     System.out.println(gamePoints);
                 }
             }
@@ -135,10 +145,17 @@ public class ScreenGame implements Screen {
         }
 
         pointCounter.draw(myGdxGame.batch, gamePoints);
+        achievementTracker.drawPopup(myGdxGame.batch);
+        if (achievementTracker.isNewAchievement()) {
+            myGdxGame.sounds.playAchievement(); // мелодия, когда всплывает новая плашка
+        }
 
         myGdxGame.batch.end();
 
         if (isGameOver) {
+            // удар звучит один раз, даже если в одном кадре врезались и вылетели
+            myGdxGame.sounds.playHit();
+            achievementTracker.onGameOver(gamePoints);
             myGdxGame.screenRestart.gamePoints = gamePoints;
             myGdxGame.setScreen(myGdxGame.screenRestart);
         }
@@ -158,6 +175,7 @@ public class ScreenGame implements Screen {
             tube.dispose();
         }
         pointCounter.dispose();
+        achievementTracker.dispose();
         for (MovingBackground mapBackground : backgrounds) {
             mapBackground.dispose();
         }

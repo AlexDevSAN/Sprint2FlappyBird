@@ -21,6 +21,7 @@ public class Tube {
     Random random;
 
     boolean isPointReceived;
+    int closestDistance = MyGdxGame.SCR_HEIGHT; // как близко птица прошла к краю просвета, для достижений
 
     // картинки колонн передаём снаружи, на каждой карте они свои
     public Tube(int tubeCount, int tubeIdx, String upperTubePath, String downTubePath) {
@@ -48,6 +49,7 @@ public class Tube {
         x -= speed;
         if (x < -width) {
             isPointReceived = false;
+            closestDistance = MyGdxGame.SCR_HEIGHT; // новая пара - меряем заново
             x = MyGdxGame.SCR_WIDTH + distanceBetweenTubes;
             gapY = gapHeight / 2 + padding + random.nextInt(MyGdxGame.SCR_HEIGHT - 2 * (padding + gapHeight / 2));
         }
@@ -81,6 +83,29 @@ public class Tube {
 
     public void setPointReceived() {
         isPointReceived = true;
+    }
+
+    // пока птица между колоннами, запоминаем самое маленькое расстояние до края просвета
+    public void updateClosestDistance(Bird bird) {
+        int birdLeft = bird.x + (bird.width - bird.hitboxWidth) / 2;
+        int birdRight = birdLeft + bird.hitboxWidth;
+        int birdBottom = bird.y + (bird.height - bird.hitboxHeight) / 2;
+        int birdTop = birdBottom + bird.hitboxHeight;
+
+        if (birdRight >= x && birdLeft <= x + width) {
+            int toLowerTube = birdBottom - (gapY - gapHeight / 2);
+            int toUpperTube = (gapY + gapHeight / 2) - birdTop;
+            if (toLowerTube < closestDistance) {
+                closestDistance = toLowerTube;
+            }
+            if (toUpperTube < closestDistance) {
+                closestDistance = toUpperTube;
+            }
+        }
+    }
+
+    public int getClosestDistance() {
+        return closestDistance;
     }
 
     public void draw(Batch batch) {

@@ -3,6 +3,7 @@ package ru.samsung.gamestudio;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import ru.samsung.gamestudio.components.GameSounds;
 import ru.samsung.gamestudio.screens.ScreenGame;
 import ru.samsung.gamestudio.screens.ScreenLevel;
 import ru.samsung.gamestudio.screens.ScreenMap;
@@ -13,6 +14,7 @@ import ru.samsung.gamestudio.screens.screenMenu;
 public class MyGdxGame extends Game {
     public SpriteBatch batch;
     public OrthographicCamera camera;
+    public GameSounds sounds; // все звуки и музыка игры
     public ScreenGame screenGame;
     public ScreenRestart screenRestart;
     public ScreenMap screenMap; // выбор карты
@@ -30,6 +32,7 @@ public class MyGdxGame extends Game {
         batch = new SpriteBatch();
         camera = new OrthographicCamera();
         camera.setToOrtho(false, SCR_WIDTH, SCR_HEIGHT);
+        sounds = new GameSounds(); // до setScreen: меню сразу включает музыку
 
         difficulty = new Difficulty(); // раньше экранов, экраны берут из него числа
         screenGame = new ScreenGame(this);
@@ -46,5 +49,6 @@ public class MyGdxGame extends Game {
     @Override
     public void dispose() {
         batch.dispose();
+        sounds.dispose();
     }
 }
