@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import ru.samsung.gamestudio.components.AchievementTracker;
 import ru.samsung.gamestudio.components.GameSounds;
 import ru.samsung.gamestudio.components.MovingBackground;
+import ru.samsung.gamestudio.screens.ScreenEaster;
 import ru.samsung.gamestudio.screens.ScreenGame;
 import ru.samsung.gamestudio.screens.ScreenLevel;
 import ru.samsung.gamestudio.screens.ScreenMap;
@@ -30,9 +31,10 @@ public class MyGdxGame extends Game {
     public static final String[] MAP_DOWN_TUBES = {"Tube/tube.png", "cave/stone.png"};
     public static final String[] MAP_MUSIC = {"music/city.ogg", "music/cave.ogg"};
 
-    // птицы: номер в массиве = номер птицы
-    public static final String[] BIRD_NAMES = {"Blue", "Classic", "Hero"};
-    public static final String[] BIRD_FOLDERS = {"birdTiles", "birdClassic", "birdHero"};
+    // птицы: номер в массиве = номер птицы; последняя - секретная, её открывает пасхалка
+    public static final int BIRD_MAD = 3;
+    public static final String[] BIRD_NAMES = {"Blue", "Classic", "Hero", "Mad"};
+    public static final String[] BIRD_FOLDERS = {"birdTiles", "birdClassic", "birdHero", "birdMad"};
 
     public SpriteBatch batch;
     public OrthographicCamera camera;
@@ -43,12 +45,18 @@ public class MyGdxGame extends Game {
     public AchievementTracker achievementTracker;
     public MovingBackground menuBackground; // один фон на меню, экраны выбора и рестарт
 
+    // за этот запуск игры: сколько раз проиграли, лучший счёт, открыта ли секретная птица
+    public int lossCount;
+    public int bestScore;
+    public boolean isMadBirdUnlocked;
+
     public ScreenMenu screenMenu;
     public ScreenMap screenMap;
     public ScreenSkin screenSkin;
     public ScreenLevel screenLevel;
     public ScreenGame screenGame;
     public ScreenRestart screenRestart;
+    public ScreenEaster screenEaster;
 
     private Vector3 touch; // точка касания, одна на всю игру
 
@@ -72,6 +80,7 @@ public class MyGdxGame extends Game {
         screenLevel = new ScreenLevel(this);
         screenGame = new ScreenGame(this);
         screenRestart = new ScreenRestart(this);
+        screenEaster = new ScreenEaster(this);
 
         setScreen(screenMenu);
     }
@@ -100,6 +109,7 @@ public class MyGdxGame extends Game {
         screenLevel.dispose();
         screenGame.dispose();
         screenRestart.dispose();
+        screenEaster.dispose();
         menuBackground.dispose();
         achievementTracker.dispose();
         sounds.dispose();

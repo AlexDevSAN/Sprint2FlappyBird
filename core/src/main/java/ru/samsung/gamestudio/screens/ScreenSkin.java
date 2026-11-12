@@ -9,8 +9,8 @@ import ru.samsung.gamestudio.components.TitleText;
 
 public class ScreenSkin implements Screen {
     private static final int BUTTONS_Y = 260;
-    private static final int BUTTON_HEIGHT = 220;
-    private static final int[] BUTTON_CENTER_X = {240, 640, 1040}; // по одному числу на каждую птицу
+    private static final int BUTTON_HEIGHT = 200; // четыре птицы в ряд, поэтому чуть меньше
+    private static final int[] BUTTON_CENTER_X = {160, 480, 800, 1120}; // по одному числу на каждую птицу
 
     private MyGdxGame myGdxGame;
     private TitleText title;
@@ -30,6 +30,8 @@ public class ScreenSkin implements Screen {
 
     @Override
     public void show() {
+        // секретная птица закрыта, пока её не откроет пасхалка
+        skinButtons[MyGdxGame.BIRD_MAD].setLocked(!myGdxGame.isMadBirdUnlocked);
     }
 
     @Override

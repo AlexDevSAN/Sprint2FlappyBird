@@ -12,18 +12,21 @@ public class ParticleSystem {
     private static final int TRAIL_PERIOD = 3; // одна частица шлейфа раз в 3 кадра
     private static final int BURST_COUNT = 10; // сколько частиц в одном всплеске
 
-    // всё ниже по номеру птицы: 0 - синяя (дым), 1 - классика (перья), 2 - герой (искры)
-    private static final String[] TEXTURE_PATHS = {"particles/smoke.png", "particles/feather.png", "particles/spark.png"};
+    // всё ниже по номеру птицы: 0 - синяя (дым), 1 - классика (перья), 2 - герой (искры),
+    // 3 - секретная Mad (красно-чёрные искры)
+    private static final String[] TEXTURE_PATHS = {"particles/smoke.png", "particles/feather.png", "particles/spark.png",
+        "particles/spark.png"};
     // у каждой птицы два цвета, частица берёт один из них случайно
     private static final Color[][] COLORS = {
         {new Color(0.95f, 0.97f, 1f, 0.85f), new Color(0.75f, 0.8f, 0.9f, 0.8f)},
         {new Color(1f, 0.85f, 0.2f, 1f), new Color(1f, 0.6f, 0.15f, 1f)},
-        {new Color(1f, 0.25f, 0.1f, 1f), new Color(1f, 0.9f, 0.2f, 1f)}
+        {new Color(1f, 0.25f, 0.1f, 1f), new Color(1f, 0.9f, 0.2f, 1f)},
+        {new Color(0.9f, 0.05f, 0.05f, 1f), new Color(0.15f, 0f, 0f, 1f)}
     };
-    private static final int[] SIZES = {40, 34, 40}; // размер новой частицы
-    private static final float[] GROW_SPEEDS = {0.6f, 0f, -0.6f}; // дым растёт, перья нет, искры тают
-    private static final float[] RISE_SPEEDS = {0.4f, -0.8f, 0f}; // дым поднимается, перья падают
-    private static final int[] LIFE_TIMES = {40, 50, 25}; // сколько кадров живёт частица
+    private static final int[] SIZES = {40, 34, 40, 38}; // размер новой частицы
+    private static final float[] GROW_SPEEDS = {0.6f, 0f, -0.6f, -0.4f}; // дым растёт, перья нет, искры тают
+    private static final float[] RISE_SPEEDS = {0.4f, -0.8f, 0f, 0.3f}; // дым поднимается, перья падают
+    private static final int[] LIFE_TIMES = {40, 50, 25, 30}; // сколько кадров живёт частица
 
     private Particle[] particles; // создаются один раз, потом только переиспользуются
     private Texture[] textures;

@@ -9,6 +9,7 @@ import ru.samsung.gamestudio.MyGdxGame;
 public class GameSounds {
     private static final float MUSIC_VOLUME = 0.4f;
     private static final float FLAP_VOLUME = 0.5f; // взмахов очень много, поэтому потише
+    private static final float BLIP_VOLUME = 0.6f; // писк букв в пасхалке
 
     // короткие звуки (Sound) целиком лежат в памяти и могут звучать сразу
     private Sound flapSound;
@@ -17,10 +18,15 @@ public class GameSounds {
     private Sound clickSound;
     private Sound gameOverSound;
     private Sound achievementSound;
+    // звуки пасхалки
+    private Sound blipSound;
+    private Sound heartbeatSound;
+    private Sound glitchSound;
 
     // музыка (Music) длинная, она читается из файла по кусочку
     private Music menuMusic;
     private Music[] mapMusic; // номер трека = номер карты
+    private Music easterMusic; // гул в логове безумной птицы
     private Music currentMusic; // трек, который играет сейчас
 
     public GameSounds() {
@@ -30,12 +36,16 @@ public class GameSounds {
         clickSound = Gdx.audio.newSound(Gdx.files.internal("sounds/click.ogg"));
         gameOverSound = Gdx.audio.newSound(Gdx.files.internal("sounds/game_over.ogg"));
         achievementSound = Gdx.audio.newSound(Gdx.files.internal("sounds/achievement.ogg"));
+        blipSound = Gdx.audio.newSound(Gdx.files.internal("easter/blip.wav"));
+        heartbeatSound = Gdx.audio.newSound(Gdx.files.internal("easter/heartbeat.wav"));
+        glitchSound = Gdx.audio.newSound(Gdx.files.internal("easter/glitch.wav"));
 
         menuMusic = loadMusic("music/menu.ogg");
         mapMusic = new Music[MyGdxGame.MAP_MUSIC.length];
         for (int i = 0; i < mapMusic.length; i++) {
             mapMusic[i] = loadMusic(MyGdxGame.MAP_MUSIC[i]);
         }
+        easterMusic = loadMusic("easter/drone.ogg");
         currentMusic = menuMusic; // пока ничего не играет, но выключать всегда есть что
     }
 
@@ -70,12 +80,29 @@ public class GameSounds {
         achievementSound.play();
     }
 
+    // pitch - высота звука: 1 - как записан, больше 1 - выше, меньше 1 - ниже
+    public void playBlip(float pitch) {
+        blipSound.play(BLIP_VOLUME, pitch, 0); // 0 - звук посередине, не левее и не правее
+    }
+
+    public void playHeartbeat() {
+        heartbeatSound.play();
+    }
+
+    public void playGlitch() {
+        glitchSound.play();
+    }
+
     public void playMenuMusic() {
         playMusic(menuMusic);
     }
 
     public void playMapMusic(int mapIndex) {
         playMusic(mapMusic[mapIndex]);
+    }
+
+    public void playEasterMusic() {
+        playMusic(easterMusic);
     }
 
     // старый трек выключаем, новый включаем с начала
@@ -96,9 +123,13 @@ public class GameSounds {
         clickSound.dispose();
         gameOverSound.dispose();
         achievementSound.dispose();
+        blipSound.dispose();
+        heartbeatSound.dispose();
+        glitchSound.dispose();
         menuMusic.dispose();
         for (Music music : mapMusic) {
             music.dispose();
         }
+        easterMusic.dispose();
     }
 }

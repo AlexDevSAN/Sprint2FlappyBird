@@ -21,6 +21,7 @@ public class ScreenGame implements Screen {
 
     private Bird[] birds; // все птицы, номер = номер птицы
     private Bird bird; // птица, которой играем сейчас
+    private int birdIndex;
 
     private MovingBackground[] backgrounds; // фоны карт, номер = номер карты
     private MovingBackground background; // фон выбранной карты
@@ -69,6 +70,7 @@ public class ScreenGame implements Screen {
 
     // эти два метода вызывают экраны выбора птицы и карты
     public void setBird(int birdIndex) {
+        this.birdIndex = birdIndex;
         bird = birds[birdIndex];
         particles.setSkin(birdIndex); // шлейф как у выбранной птицы
     }
@@ -76,6 +78,19 @@ public class ScreenGame implements Screen {
     public void setMap(int mapIndex) {
         this.mapIndex = mapIndex;
         background = backgrounds[mapIndex];
+    }
+
+    // пасхалке нужно знать, чем и где играли и сколько набрали
+    public int getBirdIndex() {
+        return birdIndex;
+    }
+
+    public int getMapIndex() {
+        return mapIndex;
+    }
+
+    public int getGamePoints() {
+        return gamePoints;
     }
 
     // setScreen вызывает show() перед каждой новой игрой: возвращаем всё к началу
@@ -168,7 +183,18 @@ public class ScreenGame implements Screen {
         myGdxGame.sounds.playHit();
         myGdxGame.achievementTracker.onGameOver(gamePoints);
         myGdxGame.screenRestart.setGamePoints(gamePoints);
-        myGdxGame.setScreen(myGdxGame.screenRestart);
+
+        myGdxGame.lossCount++;
+        if (gamePoints > myGdxGame.bestScore) {
+            myGdxGame.bestScore = gamePoints;
+        }
+        // на пятом проигрыше сначала пасхалка, она сама потом откроет рестарт.
+        // lossCount дальше только растёт, поэтому за один запуск игры пасхалка бывает один раз
+        if (myGdxGame.lossCount == ScreenEaster.LOSSES_TO_SHOW) {
+            myGdxGame.setScreen(myGdxGame.screenEaster);
+        } else {
+            myGdxGame.setScreen(myGdxGame.screenRestart);
+        }
     }
 
     @Override public void resize(int width, int height) {}

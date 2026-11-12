@@ -26,3 +26,6 @@
 - Juhani Junkala — «4 Chiptunes (Adventure)» и «512 Sound Effects (8-bit style)», opengameart.org;
 - Wolfgang_ — «8-Bit Cave Loop», opengameart.org;
 - Kenney — «Interface Sounds» и «Music Jingles», kenney.nl.
+
+## Шрифт
+Пиксельный шрифт в `assets/fonts` сделан из шрифта Press Start 2P (The Press Start 2P Project Authors), лицензия SIL Open Font License 1.1. Текст лицензии лежит там же, в `OFL.txt`.

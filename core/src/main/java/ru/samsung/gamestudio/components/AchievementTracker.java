@@ -13,7 +13,9 @@ public class AchievementTracker {
     private static final int PERFECT_TEN = 2;
     private static final int CAVE_EXPLORER = 3;
     private static final int KAMIKAZE = 4;
-    private static final String[] NAMES = {"Close Shave", "Hat Trick", "Perfect Ten", "Cave Explorer", "Kamikaze"};
+    private static final int INSANITY = 5; // его даёт пасхалка
+    private static final String[] NAMES = {"Close Shave", "Hat Trick", "Perfect Ten", "Cave Explorer", "Kamikaze",
+        "Definition of Insanity"};
 
     private static final int CLOSE_SHAVE_DISTANCE = 8; // прошёл к краю просвета не дальше этого - Close Shave
     private static final int CLOSE_SHAVES_FOR_HAT_TRICK = 3;
@@ -91,6 +93,10 @@ public class AchievementTracker {
         if (gamePoints == 0) {
             unlock(KAMIKAZE);
         }
+    }
+
+    public void onEasterEgg() {
+        unlock(INSANITY);
     }
 
     private void unlock(int index) {
