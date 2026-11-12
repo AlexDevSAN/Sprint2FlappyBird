@@ -5,25 +5,27 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import ru.samsung.gamestudio.MyGdxGame;
 
 public class Bird {
-    public int x, y;
-    public int speed;
-    Texture[] framesArray;
-    int frameCounter;
+    private static final float SCALE = 0.7f; // на экране птица 70% от картинки
+    private static final float HITBOX_SCALE = 0.8f; // хитбокс 80% от птицы: прозрачные края не считаются
+    private static final int MAX_HEIGHT_OF_JUMP = 100; // на столько пикселей поднимает один взмах
+    private static final int FRAME_MULTIPLIER = 10; // столько кадров игры держится один кадр анимации
 
-    int jumpHeight;
-    final int maxHeightOfJump = 100;
-    boolean jump;
+    private int x, y;
+    private int startY; // откуда птица начинает каждую игру
+    private int speed;
+    private Texture[] framesArray;
+    private int frameCounter;
 
-    public int width;
-    public int height;
+    private int jumpHeight;
+    private boolean jump;
 
-    public int hitboxWidth;
-    public int hitboxHeight;
+    private int width, height;
+    private int hitboxWidth, hitboxHeight;
 
     // skinFolder - папка с кадрами птицы, например "birdHero"
-    public Bird(int x, int y, int speed, String skinFolder) {
+    public Bird(int x, int startY, int speed, String skinFolder) {
         this.x = x;
-        this.y = y;
+        this.startY = startY;
         this.speed = speed;
 
         framesArray = new Texture[]{
@@ -32,18 +34,26 @@ public class Bird {
             new Texture(skinFolder + "/bird2.png"),
             new Texture(skinFolder + "/bird1.png")
         };
+
+        width = (int) (framesArray[0].getWidth() * SCALE);
+        height = (int) (framesArray[0].getHeight() * SCALE);
+        hitboxWidth = (int) (width * HITBOX_SCALE);
+        hitboxHeight = (int) (height * HITBOX_SCALE);
+
+        reset();
+    }
+
+    // перед каждой новой игрой: птица на старте, прыжок из прошлой игры забыт
+    public void reset() {
+        y = startY;
+        jump = false;
+        jumpHeight = 0;
         frameCounter = 0;
-
-        this.width = (int)(framesArray[0].getWidth() * 0.7f);
-        this.height = (int)(framesArray[0].getHeight() * 0.7f);
-
-        this.hitboxWidth = (int)(this.width * 0.8f);
-        this.hitboxHeight = (int)(this.height * 0.8f);
     }
 
     public void onClick() {
         jump = true;
-        jumpHeight = maxHeightOfJump + y;
+        jumpHeight = MAX_HEIGHT_OF_JUMP + y;
     }
 
     public void fly() {
@@ -58,21 +68,52 @@ public class Bird {
         }
     }
 
+    // в поле, пока хитбокс не вышел за нижний или верхний край экрана
     public boolean isInField() {
-        if (y < 0 || y > MyGdxGame.SCR_HEIGHT) {
-            return false;
-        }
-        return true;
+        return getHitboxBottom() >= 0 && getHitboxTop() <= MyGdxGame.SCR_HEIGHT;
     }
 
     public void draw(Batch batch) {
-        int frameMultiplier = 10;
-        Texture currentFrame = framesArray[frameCounter / frameMultiplier];
+        Texture currentFrame = framesArray[frameCounter / FRAME_MULTIPLIER];
         batch.draw(currentFrame, x, y, width, height);
 
-        if (frameCounter++ == framesArray.length * frameMultiplier - 1) {
+        frameCounter++;
+        if (frameCounter == framesArray.length * FRAME_MULTIPLIER) {
             frameCounter = 0;
         }
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    // хитбокс стоит по центру птицы
+    public int getHitboxLeft() {
+        return x + (width - hitboxWidth) / 2;
+    }
+
+    public int getHitboxRight() {
+        return getHitboxLeft() + hitboxWidth;
+    }
+
+    public int getHitboxBottom() {
+        return y + (height - hitboxHeight) / 2;
+    }
+
+    public int getHitboxTop() {
+        return getHitboxBottom() + hitboxHeight;
     }
 
     public void dispose() {

@@ -8,14 +8,15 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 
 // кнопка-картинка с подписью снизу, для выбора карты и птицы
 public class ImageButton {
+    private static final int TEXT_GAP = 20; // на столько пикселей подпись ниже картинки
 
-    Texture texture;
-    BitmapFont font;
-    String text;
+    private Texture texture;
+    private BitmapFont font;
+    private String text;
 
-    int x, y;
-    int width, height;
-    int textX, textY;
+    private int x, y;
+    private int width, height;
+    private int textX, textY;
 
     public ImageButton(String texturePath, String text, int centerX, int y, int height) {
         this.text = text;
@@ -33,7 +34,7 @@ public class ImageButton {
 
         GlyphLayout gl = new GlyphLayout(font, text);
         textX = centerX - (int) gl.width / 2;
-        textY = y - 20; // подпись чуть ниже картинки
+        textY = y - TEXT_GAP;
     }
 
     public boolean isHit(int tx, int ty) {

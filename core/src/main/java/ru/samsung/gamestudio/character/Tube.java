@@ -6,95 +6,79 @@ import ru.samsung.gamestudio.MyGdxGame;
 import java.util.Random;
 
 public class Tube {
-    Texture textureUpperTube;
-    Texture textureDownTube;
+    private static final int WIDTH = 200;
+    private static final int HEIGHT = 700;
+    private static final int PADDING = 50; // просвет не подходит к краю экрана ближе этого
 
-    int x, gapY;
-    int speed = 3;
+    private Texture textureUpperTube;
+    private Texture textureDownTube;
 
-    final int width = 200;
-    final int height = 700;
-    int gapHeight = 400; // без final: уровень сложности его меняет
-    final int padding = 50;
+    private int x, gapY;
+    private int speed = 3;
+    private int gapHeight = 400;
 
-    int distanceBetweenTubes;
-    Random random;
+    private int tubeIdx; // номер колонны: по нему считаем, где она стоит в начале игры
+    private int distanceBetweenTubes;
+    private Random random;
 
-    boolean isPointReceived;
-    int closestDistance = MyGdxGame.SCR_HEIGHT; // как близко птица прошла к краю просвета, для достижений
+    private boolean isPointReceived;
+    private int closestDistance; // как близко птица прошла к краю просвета, для достижений
 
-    // картинки колонн передаём снаружи, на каждой карте они свои
-    public Tube(int tubeCount, int tubeIdx, String upperTubePath, String downTubePath) {
+    // колонны создаются один раз, а перед каждой игрой их сбрасывает reset()
+    public Tube(int tubeCount, int tubeIdx) {
+        this.tubeIdx = tubeIdx;
         random = new Random();
-
-        gapY = gapHeight / 2 + padding + random.nextInt(MyGdxGame.SCR_HEIGHT - 2 * (padding + gapHeight / 2));
-        distanceBetweenTubes = (MyGdxGame.SCR_WIDTH + width) / (tubeCount - 1);
-        x = distanceBetweenTubes * tubeIdx + MyGdxGame.SCR_WIDTH;
-
-        textureUpperTube = new Texture(upperTubePath);
-        textureDownTube = new Texture(downTubePath);
-
-        isPointReceived = false;
+        distanceBetweenTubes = (MyGdxGame.SCR_WIDTH + WIDTH) / (tubeCount - 1);
     }
 
-    // скорость и просвет текущего уровня, вызывается в начале каждой игры
-    public void setDifficulty(int speed, int gapHeight) {
+    // перед каждой игрой: картинки выбранной карты, скорость и просвет уровня, место на старте
+    public void reset(Texture upperTexture, Texture downTexture, int speed, int gapHeight) {
+        textureUpperTube = upperTexture;
+        textureDownTube = downTexture;
         this.speed = speed;
-        this.gapHeight = gapHeight;
-        // просвет стал другим, поэтому место просвета выбираем заново
-        gapY = gapHeight / 2 + padding + random.nextInt(MyGdxGame.SCR_HEIGHT - 2 * (padding + gapHeight / 2));
+        this.gapHeight = gapHeight; // сначала просвет, потом его место: место зависит от просвета
+        x = distanceBetweenTubes * tubeIdx + MyGdxGame.SCR_WIDTH;
+        newPair();
+    }
+
+    // колонна становится новой парой: новое место просвета, очко и замер ещё не получены
+    private void newPair() {
+        gapY = gapHeight / 2 + PADDING + random.nextInt(MyGdxGame.SCR_HEIGHT - 2 * (PADDING + gapHeight / 2));
+        isPointReceived = false;
+        closestDistance = MyGdxGame.SCR_HEIGHT;
     }
 
     public void move() {
         x -= speed;
-        if (x < -width) {
-            isPointReceived = false;
-            closestDistance = MyGdxGame.SCR_HEIGHT; // новая пара - меряем заново
+        if (x < -WIDTH) {
             x = MyGdxGame.SCR_WIDTH + distanceBetweenTubes;
-            gapY = gapHeight / 2 + padding + random.nextInt(MyGdxGame.SCR_HEIGHT - 2 * (padding + gapHeight / 2));
+            newPair();
         }
+    }
+
+    private int getGapBottom() {
+        return gapY - gapHeight / 2;
+    }
+
+    private int getGapTop() {
+        return gapY + gapHeight / 2;
+    }
+
+    // по горизонтали птица там же, где колонна
+    private boolean isOverTube(Bird bird) {
+        return bird.getHitboxRight() >= x && bird.getHitboxLeft() <= x + WIDTH;
     }
 
     public boolean isHit(Bird bird) {
-        int birdLeft = bird.x + (bird.width - bird.hitboxWidth) / 2;
-        int birdRight = birdLeft + bird.hitboxWidth;
-        int birdBottom = bird.y + (bird.height - bird.hitboxHeight) / 2;
-        int birdTop = birdBottom + bird.hitboxHeight;
-
-        int tubeLeft = x;
-        int tubeRight = x + width;
-        int lowerTubeTop = gapY - gapHeight / 2;
-        int upperTubeBottom = gapY + gapHeight / 2;
-
-        if (birdRight >= tubeLeft && birdLeft <= tubeRight) {
-            if (birdBottom <= lowerTubeTop || birdTop >= upperTubeBottom) {
-                return true;
-            }
-        }
-        return false;
+        boolean isOutOfGap = bird.getHitboxBottom() <= getGapBottom() || bird.getHitboxTop() >= getGapTop();
+        return isOverTube(bird) && isOutOfGap;
     }
 
-    public boolean needAddPoint(Bird bird) {
-        if (!isPointReceived && bird.x > x + width) {
-            return true;
-        }
-        return false;
-    }
-
-    public void setPointReceived() {
-        isPointReceived = true;
-    }
-
-    // пока птица между колоннами, запоминаем самое маленькое расстояние до края просвета
+    // пока птица над колонной, запоминаем самое маленькое расстояние до края просвета
     public void updateClosestDistance(Bird bird) {
-        int birdLeft = bird.x + (bird.width - bird.hitboxWidth) / 2;
-        int birdRight = birdLeft + bird.hitboxWidth;
-        int birdBottom = bird.y + (bird.height - bird.hitboxHeight) / 2;
-        int birdTop = birdBottom + bird.hitboxHeight;
-
-        if (birdRight >= x && birdLeft <= x + width) {
-            int toLowerTube = birdBottom - (gapY - gapHeight / 2);
-            int toUpperTube = (gapY + gapHeight / 2) - birdTop;
+        if (isOverTube(bird)) {
+            int toLowerTube = bird.getHitboxBottom() - getGapBottom();
+            int toUpperTube = getGapTop() - bird.getHitboxTop();
             if (toLowerTube < closestDistance) {
                 closestDistance = toLowerTube;
             }
@@ -108,13 +92,16 @@ public class Tube {
         return closestDistance;
     }
 
-    public void draw(Batch batch) {
-        batch.draw(textureUpperTube, x, gapY + gapHeight / 2, width, height);
-        batch.draw(textureDownTube, x, gapY - gapHeight / 2 - height, width, height);
+    public boolean needAddPoint(Bird bird) {
+        return !isPointReceived && bird.getX() > x + WIDTH;
     }
 
-    public void dispose() {
-        textureDownTube.dispose();
-        textureUpperTube.dispose();
+    public void setPointReceived() {
+        isPointReceived = true;
+    }
+
+    public void draw(Batch batch) {
+        batch.draw(textureUpperTube, x, getGapTop(), WIDTH, HEIGHT);
+        batch.draw(textureDownTube, x, getGapBottom() - HEIGHT, WIDTH, HEIGHT);
     }
 }

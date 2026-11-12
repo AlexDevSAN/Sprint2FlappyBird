@@ -2,43 +2,29 @@ package ru.samsung.gamestudio.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.ScreenUtils;
 import ru.samsung.gamestudio.MyGdxGame;
 import ru.samsung.gamestudio.components.ImageButton;
-import ru.samsung.gamestudio.components.MovingBackground;
+import ru.samsung.gamestudio.components.TitleText;
 
 public class ScreenMap implements Screen {
-    MyGdxGame myGdxGame;
+    private static final int BUTTONS_Y = 250;
+    private static final int BUTTON_HEIGHT = 270;
+    private static final int[] BUTTON_CENTER_X = {340, 940}; // по одному числу на каждую карту
 
-    MovingBackground background;
-    ImageButton[] mapButtons;
-
-    BitmapFont titleFont;
-    String title = "Choose map";
-    int titleX;
-    final int titleY = 650;
+    private MyGdxGame myGdxGame;
+    private TitleText title;
+    private ImageButton[] mapButtons; // номер кнопки = номер карты
 
     public ScreenMap(MyGdxGame myGdxGame) {
         this.myGdxGame = myGdxGame;
+        title = new TitleText("Choose map");
 
-        background = new MovingBackground("background/restart_bg.png"); // move() не вызываем, фон стоит на месте
-
-        // номер кнопки = номер карты в ScreenGame (0 - город, 1 - пещера)
-        mapButtons = new ImageButton[]{
-            new ImageButton("background/game_bg.png", "City", 340, 250, 270),
-            new ImageButton("cave/cave_bg.png", "Cave", 940, 250, 270)
-        };
-
-        titleFont = new BitmapFont();
-        titleFont.getData().setScale(4f);
-        titleFont.setColor(Color.WHITE);
-        // заголовок по центру: меряем его ширину
-        GlyphLayout gl = new GlyphLayout(titleFont, title);
-        titleX = (MyGdxGame.SCR_WIDTH - (int) gl.width) / 2;
+        mapButtons = new ImageButton[MyGdxGame.MAP_NAMES.length];
+        for (int i = 0; i < mapButtons.length; i++) {
+            mapButtons[i] = new ImageButton(MyGdxGame.MAP_BACKGROUNDS[i], MyGdxGame.MAP_NAMES[i],
+                BUTTON_CENTER_X[i], BUTTONS_Y, BUTTON_HEIGHT);
+        }
     }
 
     @Override
@@ -48,9 +34,7 @@ public class ScreenMap implements Screen {
     @Override
     public void render(float delta) {
         if (Gdx.input.justTouched()) {
-            Vector3 touch = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-            myGdxGame.camera.unproject(touch);
-
+            Vector3 touch = myGdxGame.getTouch();
             int touchX = (int) touch.x;
             int touchY = (int) touch.y;
 
@@ -63,14 +47,11 @@ public class ScreenMap implements Screen {
             }
         }
 
-        ScreenUtils.clear(0, 0, 0, 1);
+        myGdxGame.menuBackground.move();
 
-        myGdxGame.camera.update();
-        myGdxGame.batch.setProjectionMatrix(myGdxGame.camera.combined);
-
-        myGdxGame.batch.begin();
-        background.draw(myGdxGame.batch);
-        titleFont.draw(myGdxGame.batch, title, titleX, titleY);
+        myGdxGame.beginDraw();
+        myGdxGame.menuBackground.draw(myGdxGame.batch);
+        title.draw(myGdxGame.batch);
         for (ImageButton button : mapButtons) {
             button.draw(myGdxGame.batch);
         }
@@ -84,8 +65,7 @@ public class ScreenMap implements Screen {
 
     @Override
     public void dispose() {
-        background.dispose();
-        titleFont.dispose();
+        title.dispose();
         for (ImageButton button : mapButtons) {
             button.dispose();
         }

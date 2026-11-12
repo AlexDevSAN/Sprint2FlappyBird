@@ -6,12 +6,12 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 
 // одна частица: клубок дыма, перо или искра
 public class Particle {
-    float x, y; // центр частицы
-    float speedX, speedY; // сдвиг за кадр в пикселях
-    float size; // ширина и высота картинки
-    int life; // сколько кадров ещё живёт, 0 - частица свободна
-    int maxLife; // сколько кадров живёт с самого начала
-    Color color;
+    private float x, y; // центр частицы
+    private float speedX, speedY; // сдвиг за кадр в пикселях
+    private float size; // ширина и высота картинки
+    private int life; // сколько кадров ещё живёт, 0 - частица свободна
+    private int maxLife; // сколько кадров живёт с самого начала
+    private Color color;
 
     public Particle() {
         color = new Color(); // создаём один раз, дальше только меняем
@@ -27,6 +27,11 @@ public class Particle {
         this.life = life;
         this.maxLife = life;
         this.color.set(color);
+    }
+
+    // гасим частицу, после этого она свободна
+    public void stop() {
+        life = 0;
     }
 
     public boolean isAlive() {

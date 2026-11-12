@@ -8,39 +8,38 @@ import ru.samsung.gamestudio.character.Bird;
 
 // шлейф за птицей и всплеск при взмахе
 public class ParticleSystem {
-    final int maxParticles = 100;
-    Particle[] particles; // создаются один раз, потом только переиспользуются
-
-    public int worldSpeed = 3; // как speed у Tube: на столько пикселей частицы уносит влево за кадр
-
-    final int trailPeriod = 3; // одна частица шлейфа раз в 3 кадра
-    int trailCounter;
-    final int burstCount = 10; // сколько частиц в одном всплеске
+    private static final int MAX_PARTICLES = 100;
+    private static final int TRAIL_PERIOD = 3; // одна частица шлейфа раз в 3 кадра
+    private static final int BURST_COUNT = 10; // сколько частиц в одном всплеске
 
     // всё ниже по номеру птицы: 0 - синяя (дым), 1 - классика (перья), 2 - герой (искры)
-    int skinIndex;
-    final String[] texturePaths = {"particles/smoke.png", "particles/feather.png", "particles/spark.png"};
-    Texture[] textures;
+    private static final String[] TEXTURE_PATHS = {"particles/smoke.png", "particles/feather.png", "particles/spark.png"};
     // у каждой птицы два цвета, частица берёт один из них случайно
-    final Color[][] colors = {
+    private static final Color[][] COLORS = {
         {new Color(0.95f, 0.97f, 1f, 0.85f), new Color(0.75f, 0.8f, 0.9f, 0.8f)},
         {new Color(1f, 0.85f, 0.2f, 1f), new Color(1f, 0.6f, 0.15f, 1f)},
         {new Color(1f, 0.25f, 0.1f, 1f), new Color(1f, 0.9f, 0.2f, 1f)}
     };
-    final int[] sizes = {40, 34, 40}; // размер новой частицы
-    final float[] growSpeeds = {0.6f, 0f, -0.6f}; // дым растёт, перья нет, искры тают
-    final float[] riseSpeeds = {0.4f, -0.8f, 0f}; // дым поднимается, перья падают
-    final int[] lifeTimes = {40, 50, 25}; // сколько кадров живёт частица
+    private static final int[] SIZES = {40, 34, 40}; // размер новой частицы
+    private static final float[] GROW_SPEEDS = {0.6f, 0f, -0.6f}; // дым растёт, перья нет, искры тают
+    private static final float[] RISE_SPEEDS = {0.4f, -0.8f, 0f}; // дым поднимается, перья падают
+    private static final int[] LIFE_TIMES = {40, 50, 25}; // сколько кадров живёт частица
+
+    private Particle[] particles; // создаются один раз, потом только переиспользуются
+    private Texture[] textures;
+    private int skinIndex;
+    private int trailCounter;
+    private int worldSpeed = 3; // на столько пикселей за кадр частицы уносит влево, как колонны
 
     public ParticleSystem() {
-        particles = new Particle[maxParticles];
-        for (int i = 0; i < maxParticles; i++) {
+        particles = new Particle[MAX_PARTICLES];
+        for (int i = 0; i < MAX_PARTICLES; i++) {
             particles[i] = new Particle();
         }
 
-        textures = new Texture[texturePaths.length];
-        for (int i = 0; i < texturePaths.length; i++) {
-            textures[i] = new Texture(texturePaths[i]);
+        textures = new Texture[TEXTURE_PATHS.length];
+        for (int i = 0; i < TEXTURE_PATHS.length; i++) {
+            textures[i] = new Texture(TEXTURE_PATHS[i]);
             textures[i].setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear); // сглаживание при масштабе
         }
     }
@@ -49,38 +48,42 @@ public class ParticleSystem {
         skinIndex = birdIndex;
     }
 
+    public void setWorldSpeed(int worldSpeed) {
+        this.worldSpeed = worldSpeed;
+    }
+
     // гасим все частицы, чтобы новая игра начиналась чистой
     public void clear() {
         for (Particle particle : particles) {
-            particle.life = 0;
+            particle.stop();
         }
     }
 
     public void addTrail(Bird bird) {
         trailCounter++;
-        if (trailCounter == trailPeriod) {
+        if (trailCounter == TRAIL_PERIOD) {
             trailCounter = 0;
-            float x = bird.x + bird.width * 0.2f; // у хвоста
-            float y = bird.y + bird.height * 0.5f;
-            add(x, y, MathUtils.random(-1f, 0f), riseSpeeds[skinIndex] + MathUtils.random(-0.3f, 0.3f));
+            float x = bird.getX() + bird.getWidth() * 0.2f; // у хвоста
+            float y = bird.getY() + bird.getHeight() * 0.5f;
+            add(x, y, MathUtils.random(-1f, 0f), RISE_SPEEDS[skinIndex] + MathUtils.random(-0.3f, 0.3f));
         }
     }
 
     public void addBurst(Bird bird) {
-        float x = bird.x + bird.width * 0.4f; // под крылом
-        float y = bird.y + bird.height * 0.4f;
-        for (int i = 0; i < burstCount; i++) {
+        float x = bird.getX() + bird.getWidth() * 0.4f; // под крылом
+        float y = bird.getY() + bird.getHeight() * 0.4f;
+        for (int i = 0; i < BURST_COUNT; i++) {
             add(x, y, MathUtils.random(-3f, 1f), MathUtils.random(-3f, 1f)); // в основном назад и вниз
         }
     }
 
     // берём первую свободную частицу, если все заняты - новой не будет
-    void add(float x, float y, float speedX, float speedY) {
+    private void add(float x, float y, float speedX, float speedY) {
         for (Particle particle : particles) {
             if (!particle.isAlive()) {
-                Color color = colors[skinIndex][MathUtils.random(1)];
-                float size = sizes[skinIndex] + MathUtils.random(-4, 4);
-                particle.start(x, y, speedX, speedY, size, lifeTimes[skinIndex], color);
+                Color color = COLORS[skinIndex][MathUtils.random(1)];
+                float size = SIZES[skinIndex] + MathUtils.random(-4, 4);
+                particle.start(x, y, speedX, speedY, size, LIFE_TIMES[skinIndex], color);
                 return;
             }
         }
@@ -89,7 +92,7 @@ public class ParticleSystem {
     public void move() {
         for (Particle particle : particles) {
             if (particle.isAlive()) {
-                particle.move(worldSpeed, growSpeeds[skinIndex]);
+                particle.move(worldSpeed, GROW_SPEEDS[skinIndex]);
             }
         }
     }

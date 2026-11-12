@@ -7,15 +7,13 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 
 public class TextButton {
+    private BitmapFont font;
+    private String text;
+    private Texture texture;
 
-    BitmapFont font;
-    String text;
-    Texture texture;
-
-    int x, y;
-    int textX, textY;
-    int buttonWidth, buttonHeight;
-    int textWidth, textHeight;
+    private int x, y;
+    private int textX, textY;
+    private int buttonWidth, buttonHeight;
 
     public TextButton(int x, int y, String text) {
         this.text = text;
@@ -26,24 +24,18 @@ public class TextButton {
         font.getData().setScale(5f);
         font.setColor(Color.WHITE);
 
-        GlyphLayout gl = new GlyphLayout(font, text);
-        textWidth = (int) gl.width;
-        textHeight = (int) gl.height;
-
         texture = new Texture("button_bg.png");
         buttonWidth = texture.getWidth();
         buttonHeight = texture.getHeight();
 
-        textX = x + (buttonWidth - textWidth) / 2;
-        textY = y + (buttonHeight + textHeight) / 2;
+        // текст по центру кнопки: для этого меряем его ширину и высоту
+        GlyphLayout gl = new GlyphLayout(font, text);
+        textX = x + (buttonWidth - (int) gl.width) / 2;
+        textY = y + (buttonHeight + (int) gl.height) / 2;
     }
 
-
     public boolean isHit(int tx, int ty) {
-        if (tx > x && tx < x + buttonWidth && ty > y && ty < y + buttonHeight) {
-            return true;
-        }
-        return false;
+        return tx > x && tx < x + buttonWidth && ty > y && ty < y + buttonHeight;
     }
 
     public void draw(Batch batch) {

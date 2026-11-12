@@ -1,35 +1,28 @@
-# FlappyBird
+# Flappy Bird
 
-A [libGDX](https://libgdx.com/) project generated with [gdx-liftoff](https://github.com/libgdx/gdx-liftoff).
+Аркада на Java и libGDX, проект спринта 2 курса «Разработка мобильных игр» ИТ Школы Samsung.
+Птица летит между колоннами: тап — взмах вверх, без тапов она падает.
 
-This project was generated with a template including simple application launchers and an `ApplicationAdapter` extension that draws libGDX logo.
+## Как играть
+Меню → выбор карты → выбор птицы → выбор уровня → игра.
+- Тап — взмах.
+- Очко за каждую пролетевшую пару колонн.
+- Врезался в колонну или вылетел за экран — конец игры.
+- Restart — новая игра с теми же настройками, Main Menu — выбрать заново.
 
-## Platforms
+## Что есть в игре
+- Две карты: город и пещера, у каждой свой фон, колонны и музыка.
+- Три птицы, у каждой свой шлейф: дымок, перья, искры.
+- Три уровня сложности: Easy, Medium, Hard (скорость колонн и высота просвета).
+- Музыка и звуки.
+- Пять достижений за одну игру: Close Shave, Hat Trick, Perfect Ten, Cave Explorer, Kamikaze.
 
-- `core`: Main module with the application logic shared by all platforms.
-- `lwjgl3`: Primary desktop platform using LWJGL3; was called 'desktop' in older docs.
-- `android`: Android mobile platform. Needs Android SDK.
+## Как запустить
+- Компьютер: `./gradlew lwjgl3:run`
+- Телефон: модуль `android` в Android Studio.
 
-## Gradle
-
-This project uses [Gradle](https://gradle.org/) to manage dependencies.
-The Gradle wrapper was included, so you can run Gradle tasks using `gradlew.bat` or `./gradlew` commands.
-Useful Gradle tasks and flags:
-
-- `--continue`: when using this flag, errors will not stop the tasks from running.
-- `--daemon`: thanks to this flag, Gradle daemon will be used to run chosen tasks.
-- `--offline`: when using this flag, cached dependency archives will be used.
-- `--refresh-dependencies`: this flag forces validation of all dependencies. Useful for snapshot versions.
-- `android:lint`: performs Android project validation.
-- `build`: builds sources and archives of every project.
-- `cleanEclipse`: removes Eclipse project data.
-- `cleanIdea`: removes IntelliJ project data.
-- `clean`: removes `build` folders, which store compiled classes and built archives.
-- `eclipse`: generates Eclipse project data.
-- `idea`: generates IntelliJ project data.
-- `lwjgl3:jar`: builds application's runnable jar, which can be found at `lwjgl3/build/libs`.
-- `lwjgl3:run`: starts the application.
-- `test`: runs unit tests (if any).
-
-Note that most tasks that are not specific to a single project can be run with `name:` prefix, where the `name` should be replaced with the ID of a specific project.
-For example, `core:clean` removes `build` folder only from the `core` project.
+## Звуки и музыка
+Все под лицензией CC0:
+- Juhani Junkala — «4 Chiptunes (Adventure)» и «512 Sound Effects (8-bit style)», opengameart.org;
+- Wolfgang_ — «8-Bit Cave Loop», opengameart.org;
+- Kenney — «Interface Sounds» и «Music Jingles», kenney.nl.

@@ -3,43 +3,49 @@ package ru.samsung.gamestudio.components;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import ru.samsung.gamestudio.MyGdxGame;
 
 // достижения за одну игру: игра сообщает события, а здесь решаем, что открыто
 public class AchievementTracker {
-    // номера достижений в массиве names
-    static final int CLOSE_SHAVE = 0;
-    static final int HAT_TRICK = 1;
-    static final int PERFECT_TEN = 2;
-    static final int CAVE_EXPLORER = 3;
-    static final int KAMIKAZE = 4;
+    // номера достижений в массиве NAMES
+    private static final int CLOSE_SHAVE = 0;
+    private static final int HAT_TRICK = 1;
+    private static final int PERFECT_TEN = 2;
+    private static final int CAVE_EXPLORER = 3;
+    private static final int KAMIKAZE = 4;
+    private static final String[] NAMES = {"Close Shave", "Hat Trick", "Perfect Ten", "Cave Explorer", "Kamikaze"};
 
-    final String[] names = {"Close Shave", "Hat Trick", "Perfect Ten", "Cave Explorer", "Kamikaze"};
+    private static final int CLOSE_SHAVE_DISTANCE = 8; // прошёл к краю просвета не дальше этого - Close Shave
+    private static final int CLOSE_SHAVES_FOR_HAT_TRICK = 3;
+    private static final int POINTS_FOR_PERFECT_TEN = 10;
+    private static final int POINTS_FOR_CAVE_EXPLORER = 5;
 
-    final int closeShaveDistance = 8; // прошёл к краю просвета не дальше этого - Close Shave
-    final int closeShavesForHatTrick = 3;
-    final int pointsForPerfectTen = 10;
-    final int pointsForCaveExplorer = 5;
-    final int caveMapIndex = 1; // номер пещеры, как в ScreenGame
+    private static final int POPUP_X = 20;
+    private static final int POPUP_Y = 700;
+    private static final int LIST_X = 750;
+    private static final int LIST_Y = 440;
+    private static final int POPUP_FRAMES = 120; // 2 секунды при 60 кадрах в секунду
 
-    boolean[] isUnlocked; // какие достижения уже открыты в этой игре
-    int[] unlockOrder; // номера открытых достижений по порядку, это же очередь плашек
-    int unlockedCount;
-    int closeShaveCount; // сколько раз прошли впритирку
+    private boolean[] isUnlocked; // какие достижения уже открыты в этой игре
+    private int[] unlockOrder; // номера открытых достижений по порядку, это же очередь плашек
+    private int unlockedCount;
+    private int closeShaveCount; // сколько раз прошли впритирку
 
-    BitmapFont font;
-    final int popupX = 20;
-    final int popupY = 700;
-    final int listX = 750;
-    final int listY = 440;
+    private String[] popupTexts; // тексты плашек собираем один раз, а не каждый кадр
+    private String listText; // список для экрана рестарта, дописываем при каждом новом достижении
 
-    final int popupFrames = 120; // 2 секунды при 60 кадрах в секунду
-    int shownCount; // сколько плашек уже показали
-    int popupTimer; // сколько кадров висит текущая плашка
-    boolean isNewPopup;
+    private BitmapFont font;
+    private int shownCount; // сколько плашек уже показали
+    private int popupTimer; // сколько кадров висит текущая плашка
+    private boolean isNewPopup;
 
     public AchievementTracker() {
-        isUnlocked = new boolean[names.length];
-        unlockOrder = new int[names.length];
+        isUnlocked = new boolean[NAMES.length];
+        unlockOrder = new int[NAMES.length];
+        popupTexts = new String[NAMES.length];
+        for (int i = 0; i < NAMES.length; i++) {
+            popupTexts[i] = "Achievement: " + NAMES[i];
+        }
 
         font = new BitmapFont();
         font.getData().setScale(3f); // мельче счёта, у него 5
@@ -50,7 +56,7 @@ public class AchievementTracker {
 
     // новая игра - всё с нуля
     public void reset() {
-        for (int i = 0; i < names.length; i++) {
+        for (int i = 0; i < NAMES.length; i++) {
             isUnlocked[i] = false;
         }
         unlockedCount = 0;
@@ -58,23 +64,24 @@ public class AchievementTracker {
         shownCount = 0;
         popupTimer = 0;
         isNewPopup = false;
+        listText = "No achievements";
     }
 
     public void onPoint(int gamePoints, int mapIndex) {
-        if (gamePoints >= pointsForPerfectTen) {
+        if (gamePoints >= POINTS_FOR_PERFECT_TEN) {
             unlock(PERFECT_TEN);
         }
-        if (mapIndex == caveMapIndex && gamePoints >= pointsForCaveExplorer) {
+        if (mapIndex == MyGdxGame.MAP_CAVE && gamePoints >= POINTS_FOR_CAVE_EXPLORER) {
             unlock(CAVE_EXPLORER);
         }
     }
 
     // closestDistance - как близко птица была к краю просвета, пока пролетала пару колонн
     public void onTubePassed(int closestDistance) {
-        if (closestDistance <= closeShaveDistance) {
+        if (closestDistance <= CLOSE_SHAVE_DISTANCE) {
             closeShaveCount++;
             unlock(CLOSE_SHAVE);
-            if (closeShaveCount >= closeShavesForHatTrick) {
+            if (closeShaveCount >= CLOSE_SHAVES_FOR_HAT_TRICK) {
                 unlock(HAT_TRICK);
             }
         }
@@ -86,36 +93,22 @@ public class AchievementTracker {
         }
     }
 
-    void unlock(int index) {
+    private void unlock(int index) {
         if (isUnlocked[index]) {
             return; // за одну игру второй раз не даём
         }
         isUnlocked[index] = true;
         unlockOrder[unlockedCount] = index; // встаёт в очередь на плашку
         unlockedCount++;
+
+        // первое достижение начинает список, остальные дописываются с новой строки
+        if (unlockedCount == 1) {
+            listText = "Achievements:";
+        }
+        listText += "\n" + NAMES[index];
     }
 
-    // текст плашки или null, если показывать нечего
-    public String getPopupText() {
-        if (shownCount == unlockedCount) {
-            return null;
-        }
-        return "Achievement: " + names[unlockOrder[shownCount]];
-    }
-
-    // список для экрана рестарта, \n - перенос строки
-    public String getListText() {
-        if (unlockedCount == 0) {
-            return "No achievements";
-        }
-        String text = "Achievements:";
-        for (int i = 0; i < unlockedCount; i++) {
-            text += "\n" + names[unlockOrder[i]];
-        }
-        return text;
-    }
-
-    // true один раз, когда всплыла новая плашка (сюда подключат звук)
+    // true один раз, когда всплыла новая плашка: по нему играет мелодия достижения
     public boolean isNewAchievement() {
         if (isNewPopup) {
             isNewPopup = false;
@@ -125,23 +118,22 @@ public class AchievementTracker {
     }
 
     public void drawPopup(Batch batch) {
-        String text = getPopupText();
-        if (text == null) {
-            return;
+        if (shownCount == unlockedCount) {
+            return; // показывать нечего
         }
         if (popupTimer == 0) {
             isNewPopup = true;
         }
-        font.draw(batch, text, popupX, popupY);
+        font.draw(batch, popupTexts[unlockOrder[shownCount]], POPUP_X, POPUP_Y);
         popupTimer++;
-        if (popupTimer == popupFrames) {
+        if (popupTimer == POPUP_FRAMES) {
             popupTimer = 0;
             shownCount++; // эта плашка своё отвисела, дальше следующая из очереди
         }
     }
 
     public void drawList(Batch batch) {
-        font.draw(batch, getListText(), listX, listY);
+        font.draw(batch, listText, LIST_X, LIST_Y);
     }
 
     public void dispose() {

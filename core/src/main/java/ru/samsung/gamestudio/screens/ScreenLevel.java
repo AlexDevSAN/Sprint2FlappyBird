@@ -2,46 +2,29 @@ package ru.samsung.gamestudio.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.ScreenUtils;
+import ru.samsung.gamestudio.Difficulty;
 import ru.samsung.gamestudio.MyGdxGame;
-import ru.samsung.gamestudio.components.MovingBackground;
 import ru.samsung.gamestudio.components.TextButton;
+import ru.samsung.gamestudio.components.TitleText;
 
 public class ScreenLevel implements Screen {
-    MyGdxGame myGdxGame;
+    private static final int BUTTON_WIDTH = 470; // ширина картинки button_bg.png
+    private static final int BUTTON_X = (MyGdxGame.SCR_WIDTH - BUTTON_WIDTH) / 2; // кнопки по центру
+    private static final int[] BUTTON_Y = {400, 215, 30}; // сверху вниз: Easy, Medium, Hard
 
-    MovingBackground background;
-    TextButton[] levelButtons;
-
-    BitmapFont titleFont;
-    String title = "Choose level";
-    int titleX;
-    final int titleY = 650;
+    private MyGdxGame myGdxGame;
+    private TitleText title;
+    private TextButton[] levelButtons; // номер кнопки = номер уровня
 
     public ScreenLevel(MyGdxGame myGdxGame) {
         this.myGdxGame = myGdxGame;
+        title = new TitleText("Choose level");
 
-        background = new MovingBackground("background/restart_bg.png"); // move() не вызываем, фон стоит на месте
-
-        // три кнопки столбиком по центру, 470 - ширина картинки button_bg.png
-        int buttonX = (MyGdxGame.SCR_WIDTH - 470) / 2;
-        // номер кнопки = номер уровня в Difficulty (0 - Easy, 1 - Medium, 2 - Hard)
-        levelButtons = new TextButton[]{
-            new TextButton(buttonX, 400, "Easy"),
-            new TextButton(buttonX, 215, "Medium"),
-            new TextButton(buttonX, 30, "Hard")
-        };
-
-        titleFont = new BitmapFont();
-        titleFont.getData().setScale(4f);
-        titleFont.setColor(Color.WHITE);
-        // заголовок по центру: меряем его ширину
-        GlyphLayout gl = new GlyphLayout(titleFont, title);
-        titleX = (MyGdxGame.SCR_WIDTH - (int) gl.width) / 2;
+        levelButtons = new TextButton[Difficulty.LEVEL_NAMES.length];
+        for (int i = 0; i < levelButtons.length; i++) {
+            levelButtons[i] = new TextButton(BUTTON_X, BUTTON_Y[i], Difficulty.LEVEL_NAMES[i]);
+        }
     }
 
     @Override
@@ -51,9 +34,7 @@ public class ScreenLevel implements Screen {
     @Override
     public void render(float delta) {
         if (Gdx.input.justTouched()) {
-            Vector3 touch = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-            myGdxGame.camera.unproject(touch);
-
+            Vector3 touch = myGdxGame.getTouch();
             int touchX = (int) touch.x;
             int touchY = (int) touch.y;
 
@@ -67,14 +48,11 @@ public class ScreenLevel implements Screen {
             }
         }
 
-        ScreenUtils.clear(0, 0, 0, 1);
+        myGdxGame.menuBackground.move();
 
-        myGdxGame.camera.update();
-        myGdxGame.batch.setProjectionMatrix(myGdxGame.camera.combined);
-
-        myGdxGame.batch.begin();
-        background.draw(myGdxGame.batch);
-        titleFont.draw(myGdxGame.batch, title, titleX, titleY);
+        myGdxGame.beginDraw();
+        myGdxGame.menuBackground.draw(myGdxGame.batch);
+        title.draw(myGdxGame.batch);
         for (TextButton button : levelButtons) {
             button.draw(myGdxGame.batch);
         }
@@ -88,8 +66,7 @@ public class ScreenLevel implements Screen {
 
     @Override
     public void dispose() {
-        background.dispose();
-        titleFont.dispose();
+        title.dispose();
         for (TextButton button : levelButtons) {
             button.dispose();
         }
